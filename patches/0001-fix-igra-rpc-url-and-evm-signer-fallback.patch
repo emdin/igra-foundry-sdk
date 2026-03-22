@@ -1,0 +1,98 @@
+diff --git a/crates/cast/src/cmd/send.rs b/crates/cast/src/cmd/send.rs
+index 75462ec..25429c4 100644
+--- a/crates/cast/src/cmd/send.rs
++++ b/crates/cast/src/cmd/send.rs
+@@ -203,7 +203,8 @@ pub async fn run(self) -> eyre::Result<()> {
+         // enough information to sign and we must bail.
+         } else {
+             // Retrieve the signer, and bail if it can't be constructed.
+-            let signer = send_tx.eth.wallet.signer().await?;
++            // In IGRA mode, fall back to the kaspa_wallet key if no explicit EVM key was given.
++            let signer = send_tx.eth.wallet.signer_with_igra_fallback(&config).await?;
+             let from = signer.address();
+ 
+             tx::validate_from_address(send_tx.eth.wallet.from, from)?;
+diff --git a/crates/common/src/provider/mod.rs b/crates/common/src/provider/mod.rs
+index 6e8dc98..f3c5576 100644
+--- a/crates/common/src/provider/mod.rs
++++ b/crates/common/src/provider/mod.rs
+@@ -176,7 +176,20 @@ pub fn new(url_str: &str) -> Self {
+     pub fn from_config(config: &Config) -> Result<Self> {
+         config.igra.validate().wrap_err("invalid IGRA configuration")?;
+ 
+-        let url = config.get_rpc_url_or_localhost_http()?;
++        // When IGRA is enabled and no explicit --rpc-url / ETH_RPC_URL was provided,
++        // fall back to el_rpc_url from the IGRA config section before defaulting to
++        // localhost:8545.
++        let url = if let Some(url) = config.get_rpc_url() {
++            url?
++        } else if config.igra.enabled {
++            if let Some(ref el_url) = config.igra.el_rpc_url {
++                std::borrow::Cow::Owned(el_url.clone())
++            } else {
++                std::borrow::Cow::Borrowed("http://localhost:8545")
++            }
++        } else {
++            std::borrow::Cow::Borrowed("http://localhost:8545")
++        };
+         let mut builder = Self::new(url.as_ref());
+ 
+         builder = builder.accept_invalid_certs(config.eth_rpc_accept_invalid_certs);
+diff --git a/crates/forge/src/cmd/create.rs b/crates/forge/src/cmd/create.rs
+index 2cf4a33..564cd54 100644
+--- a/crates/forge/src/cmd/create.rs
++++ b/crates/forge/src/cmd/create.rs
+@@ -194,7 +194,8 @@ pub async fn run(mut self) -> Result<()> {
+             .await
+         } else {
+             // Deploy with signer
+-            let signer = self.eth.wallet.signer().await?;
++            // In IGRA mode, fall back to the kaspa_wallet key if no explicit EVM key was given.
++            let signer = self.eth.wallet.signer_with_igra_fallback(&config).await?;
+             let deployer = signer.address();
+             let provider = ProviderBuilder::<_, _, AnyNetwork>::default()
+                 .wallet(EthereumWallet::new(signer))
+diff --git a/crates/wallets/src/opts.rs b/crates/wallets/src/opts.rs
+index 4128548..6e3aa2f 100644
+--- a/crates/wallets/src/opts.rs
++++ b/crates/wallets/src/opts.rs
+@@ -233,6 +233,39 @@ pub fn as_config(&self) -> IgraKaspaWalletConfig {
+ }
+ 
+ impl WalletOpts {
++    /// Returns the EVM signer, falling back to the IGRA kaspa_wallet private key
++    /// when IGRA is enabled and no explicit EVM key source was provided.
++    ///
++    /// In IGRA mode, both the EVM L2 address and the Kaspa L1 address are derived
++    /// from the same private key, so reusing `kaspa_wallet.private_key` as the EVM
++    /// signer is expected behaviour when no separate EVM key is given.
++    pub async fn signer_with_igra_fallback(&self, config: &Config) -> Result<WalletSigner> {
++        match self.signer().await {
++            Ok(signer) => Ok(signer),
++            Err(_) if config.igra.enabled => {
++                if let Some(ref pk) = config.igra.kaspa_wallet.private_key {
++                    utils::create_private_key_signer(pk)
++                        .map_err(|e| eyre::eyre!("IGRA EVM signer fallback failed: {e}"))
++                } else if let Some(ref mnemonic) = config.igra.kaspa_wallet.mnemonic {
++                    utils::create_mnemonic_signer(
++                        mnemonic,
++                        config.igra.kaspa_wallet.mnemonic_passphrase.as_deref(),
++                        config.igra.kaspa_wallet.mnemonic_derivation_path.as_deref(),
++                        config.igra.kaspa_wallet.mnemonic_index.unwrap_or(0),
++                    )
++                    .map_err(|e| eyre::eyre!("IGRA EVM signer fallback from mnemonic failed: {e}"))
++                } else {
++                    eyre::bail!(
++                        "IGRA mode is enabled but no wallet key was found. \
++                         Provide --private-key, --private-key-kaspa, or set \
++                         kaspa_wallet.private_key in foundry.toml"
++                    )
++                }
++            }
++            Err(e) => Err(e),
++        }
++    }
++
+     pub async fn signer(&self) -> Result<WalletSigner> {
+         trace!("start finding signer");
+ 

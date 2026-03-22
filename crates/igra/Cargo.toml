@@ -1,0 +1,43 @@
+[package]
+name = "foundry-igra"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.81"
+description = "IGRA Network transport layer — Kaspa L1 submission for EVM L2 transactions"
+license = "MIT"
+repository = "https://github.com/IgraLabs/igra-foundry-sdk"
+
+[dependencies]
+# Kaspa — pinned to IgraLabs fork
+kaspa-addresses = { git = "https://github.com/IgraLabs/rusty-kaspa.git", rev = "7d303eb026934cdad8a47eb3c604d82027ca202b" }
+kaspa-bip32 = { git = "https://github.com/IgraLabs/rusty-kaspa.git", rev = "7d303eb026934cdad8a47eb3c604d82027ca202b" }
+kaspa-consensus-core = { git = "https://github.com/IgraLabs/rusty-kaspa.git", rev = "7d303eb026934cdad8a47eb3c604d82027ca202b" }
+kaspa-grpc-client = { git = "https://github.com/IgraLabs/rusty-kaspa.git", rev = "7d303eb026934cdad8a47eb3c604d82027ca202b" }
+kaspa-rpc-core = { git = "https://github.com/IgraLabs/rusty-kaspa.git", rev = "7d303eb026934cdad8a47eb3c604d82027ca202b" }
+kaspa-txscript = { git = "https://github.com/IgraLabs/rusty-kaspa.git", rev = "7d303eb026934cdad8a47eb3c604d82027ca202b" }
+
+# Alloy (EVM types) — version-matched to Foundry fork
+alloy-consensus = { version = "1.4", default-features = false, features = ["k256"] }
+alloy-json-rpc = { version = "1.4", default-features = false }
+alloy-primitives = { version = "1.5.2", features = ["serde", "getrandom", "rlp"] }
+alloy-provider = { version = "1.4", default-features = false }
+alloy-signer-local = { version = "1.4", default-features = false, features = ["mnemonic", "keystore"] }
+alloy-transport = { version = "1.4", default-features = false }
+alloy-network = { version = "1.4", default-features = false }
+alloy-serde = { version = "1.4", default-features = false }
+
+# Infrastructure
+tower = "0.5"
+async-trait = "0.1"
+tokio = { version = "1", features = ["sync", "time"] }
+tracing = "0.1"
+rusqlite = { version = "0.37", features = ["bundled"] }
+reqwest = { version = "0.12", default-features = false }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+eyre = "0.6"
+thiserror = "2"
+
+[dev-dependencies]
+tokio = { version = "1", features = ["rt-multi-thread", "macros"] }
+alloy-primitives = { version = "1.5.2", features = ["serde", "getrandom", "rlp", "arbitrary"] }
