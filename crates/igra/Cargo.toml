@@ -5,7 +5,7 @@ edition = "2021"
 rust-version = "1.81"
 description = "IGRA Network transport layer — Kaspa L1 submission for EVM L2 transactions"
 license = "MIT"
-repository = "https://github.com/IgraLabs/igra-foundry-sdk"
+repository = "https://github.com/emdin/igra-foundry-sdk"
 
 [dependencies]
 # Kaspa — pinned to IgraLabs fork

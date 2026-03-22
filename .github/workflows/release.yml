@@ -97,7 +97,7 @@ jobs:
             ## Install
 
             ```bash
-            curl -L https://raw.githubusercontent.com/IgraLabs/igra-foundry-sdk/main/igraup/install | bash
+            curl -L https://raw.githubusercontent.com/emdin/igra-foundry-sdk/main/igraup/install | bash
             source ~/.zshenv
             igraup
             ```

@@ -3,7 +3,7 @@ set -euo pipefail
 
 IGRA_DIR="${IGRA_DIR:-$HOME/.igra}"
 IGRA_BIN_DIR="$IGRA_DIR/bin"
-REPO="IgraLabs/igra-foundry-sdk"
+REPO="emdin/igra-foundry-sdk"
 
 main() {
     local version="${1:-latest}"

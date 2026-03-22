@@ -11,7 +11,7 @@
 ### Option A: Pre-built Binaries
 
 ```bash
-curl -L https://raw.githubusercontent.com/IgraLabs/igra-foundry-sdk/main/igraup/install | bash
+curl -L https://raw.githubusercontent.com/emdin/igra-foundry-sdk/main/igraup/install | bash
 source ~/.zshenv  # or restart terminal
 igraup
 ```

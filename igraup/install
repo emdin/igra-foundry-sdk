@@ -9,7 +9,7 @@ main() {
 
     mkdir -p "$IGRA_BIN_DIR"
 
-    IGRAUP_URL="https://raw.githubusercontent.com/IgraLabs/igra-foundry-sdk/main/igraup/igraup"
+    IGRAUP_URL="https://raw.githubusercontent.com/emdin/igra-foundry-sdk/main/igraup/igraup"
     curl -fsSL "$IGRAUP_URL" -o "$IGRA_BIN_DIR/igraup"
     chmod +x "$IGRA_BIN_DIR/igraup"
 

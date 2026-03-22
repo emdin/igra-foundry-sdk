@@ -9,7 +9,7 @@ IGRA is an EVM L2 on Kaspa. This SDK gives you `igra-cast` and `igra-forge` — 
 ### 1. Install
 
 ```bash
-curl -L https://raw.githubusercontent.com/IgraLabs/igra-foundry-sdk/main/igraup/install | bash
+curl -L https://raw.githubusercontent.com/emdin/igra-foundry-sdk/main/igraup/install | bash
 source ~/.zshenv  # or restart your terminal
 igraup
 ```
