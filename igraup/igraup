@@ -55,13 +55,19 @@ main() {
     echo "  fetching release info..."
     local release_json
     release_json=$(curl -fsSL "$release_url") || {
-        echo "No releases found at ${REPO}."
+        echo "No pre-built releases found at ${REPO}."
         echo ""
-        echo "To install from source instead:"
-        echo "  git clone https://github.com/${REPO}.git"
-        echo "  cd foundry && cargo build -p cast -p forge --release"
+        echo "Building from source instead (requires Rust toolchain):"
+        echo ""
+        echo "  git clone -b roman/kaspa-igra-support https://github.com/${REPO}.git igra-foundry"
+        echo "  cd igra-foundry"
+        echo "  cargo build -p cast -p forge --release"
+        echo "  mkdir -p ~/.igra/bin"
         echo "  cp target/release/cast ~/.igra/bin/igra-cast"
         echo "  cp target/release/forge ~/.igra/bin/igra-forge"
+        echo ""
+        echo "Note: requires rusty-kaspa and kaswallet as sibling directories."
+        echo "See https://github.com/IgraLabs/igra-foundry-sdk for details."
         exit 1
     }
 

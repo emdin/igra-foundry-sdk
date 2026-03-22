@@ -2,14 +2,14 @@
 
 ## Transaction Type
 
-IGRA requires **Legacy (type 0)** transactions. Always use the `--legacy` flag:
+Always use the `--legacy` flag:
 
 ```bash
 igra-cast send --legacy ...
 igra-forge create --legacy ...
 ```
 
-EIP-1559 (type 2) transactions are also supported at the EVM level, but Legacy is recommended. EIP-4844 and EIP-7702 are not supported.
+Legacy (type 0), EIP-2930 (type 1), and EIP-1559 (type 2) transactions are all supported. EIP-4844 (blob) and EIP-7702 are **not** supported. Legacy is recommended for simplicity.
 
 ## Gas Price
 
@@ -42,7 +42,7 @@ Set gas limit to 1.5-2x the expected gas usage:
 
 ## Maximum Transaction Size
 
-Maximum L2 data payload is approximately **21 KB**, constrained by Kaspa's L1 data availability limit. Large contract deployments may need to use proxy patterns to stay under this limit.
+Maximum L2 data payload is approximately **24 KB** (24,800 bytes), constrained by Kaspa's L1 data availability limit. Large contract deployments may need to use proxy patterns to stay under this limit.
 
 The block gas limit is 10,000,000,000 (10B), so gas is not the bottleneck — payload size is.
 
@@ -71,7 +71,7 @@ Formal finality follows Kaspa's protocol (~12 hours).
 
 To get iKAS (L2 gas token), bridge KAS from L1. Minimum bridge amount is **100 KAS**.
 
-Each L1 transaction costs approximately **0.0022 KAS** in Kaspa network fees.
+Each L1 transaction costs approximately **0.002 KAS** in Kaspa network fees.
 
 ## Nonce Ordering
 

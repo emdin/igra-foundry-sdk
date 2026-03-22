@@ -37,6 +37,7 @@ contract SimpleDEX is ERC20 {
         uint256 resA = tokenA.balanceOf(address(this));
         uint256 resB = tokenB.balanceOf(address(this));
         amountOut = (amountIn * 997 * resB) / (resA * 1000 + amountIn * 997);
+        require(amountOut > 0, "insufficient output");
         tokenA.transferFrom(msg.sender, address(this), amountIn);
         tokenB.transfer(msg.sender, amountOut);
         emit Swap(msg.sender, address(tokenA), amountIn, amountOut);
@@ -46,6 +47,7 @@ contract SimpleDEX is ERC20 {
         uint256 resA = tokenA.balanceOf(address(this));
         uint256 resB = tokenB.balanceOf(address(this));
         amountOut = (amountIn * 997 * resA) / (resB * 1000 + amountIn * 997);
+        require(amountOut > 0, "insufficient output");
         tokenB.transferFrom(msg.sender, address(this), amountIn);
         tokenA.transfer(msg.sender, amountOut);
         emit Swap(msg.sender, address(tokenB), amountIn, amountOut);

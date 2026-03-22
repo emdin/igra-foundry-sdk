@@ -1,16 +1,14 @@
 [profile.default]
 solc_version = "0.8.20"
 
-# Copy one of the configs from ../../configs/ and fill in your private key.
-# Example for mainnet:
 [profile.default.igra]
 enabled = true
-el_rpc_url = "YOUR_IGRA_RPC_URL"
-kaspa_rpc_url = "YOUR_KASPA_GRPC_URL"
+el_rpc_url = "https://rpc.igralabs.com:8545"
+kaspa_rpc_url = "grpc://95.217.73.85:16110"
 kaspa_network = "mainnet"
 tx_id_prefix = "97b1"
 expected_el_chain_id = 38833
 el_receipt_timeout_secs = 10
 
 [profile.default.igra.kaspa_wallet]
-private_key = "YOUR_PRIVATE_KEY_HERE"
+private_key = "YOUR_64_CHAR_HEX_PRIVATE_KEY"

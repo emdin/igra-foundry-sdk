@@ -54,6 +54,9 @@ contract Staking {
         uint256 reward = (block.number - s.startBlock) * s.amount * rewardRate / 1e18;
         s.startBlock = block.number;
         s.rewardDebt += reward;
+        if (reward > 0) {
+            stakingToken.transfer(msg.sender, reward);
+        }
         return reward;
     }
 }
