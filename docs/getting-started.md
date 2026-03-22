@@ -63,9 +63,25 @@ The private key is a 32-byte hex string (64 characters). The same key derives bo
 
 ### 3. Fund your wallet
 
-You need KAS on L1 for transaction fees. Each transaction costs approximately 0.0022 KAS in L1 fees.
+Sending transactions on IGRA requires tokens on **two layers**:
 
-For contract deployment gas on L2, you need iKAS (bridged from KAS). Bridge at least 100 KAS to get iKAS for deployments.
+| Layer | Token | What it pays for | How to get it |
+|-------|-------|-----------------|---------------|
+| Kaspa L1 | **KAS** | Data availability fee (~0.0022 KAS per tx) | Buy or receive KAS |
+| IGRA L2 | **iKAS** | EVM gas + transfer value | [Faucet](https://igra-labs.gitbook.io/igralabs-docs/quickstart/network-info) (small amounts) or bridge KAS → iKAS |
+
+The faucet gives you iKAS on L2 only. That covers L2 gas, but every write transaction (`send`, `create`) also submits a Kaspa L1 transaction under the hood, which requires KAS on L1.
+
+**Finding your Kaspa L1 address**: the same private key derives both your EVM and Kaspa addresses. To find your Kaspa address, try sending a transaction — if you don't have L1 KAS, the error will show it:
+
+```
+IGRA submit error: insufficient Kaspa UTXOs for fee payment
+(source address: kaspa:qq...)
+```
+
+Fund that `kaspa:qq...` address with a small amount of KAS (0.1 KAS is enough for ~45 transactions).
+
+For larger L2 balances, bridge KAS → iKAS by sending an entry transaction. See the [IGRA docs](https://igra-labs.gitbook.io/igralabs-docs/quickstart/network-info) for bridge details.
 
 ### 4. Check your setup
 
