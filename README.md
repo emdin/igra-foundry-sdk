@@ -14,7 +14,9 @@ source ~/.zshenv  # or restart your terminal
 igraup
 ```
 
-> **No releases yet?** Build from source — see [Getting Started](docs/getting-started.md#build-from-source).
+This downloads pre-built `igra-cast` and `igra-forge` to `~/.igra/bin/`. Your existing Foundry is untouched.
+
+> **Build from source?** See [Getting Started](docs/getting-started.md#build-from-source) for the full build instructions (requires Rust + 3 repos).
 
 ### 2. Init + Configure
 
