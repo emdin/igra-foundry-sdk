@@ -1,0 +1,124 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+IGRA_DIR="${IGRA_DIR:-$HOME/.igra}"
+IGRA_BIN_DIR="$IGRA_DIR/bin"
+REPO="IgraLabs/foundry"
+
+main() {
+    local version="${1:-latest}"
+
+    echo "igraup: installing IGRA Foundry..."
+
+    # Detect platform
+    local platform
+    case "$(uname -s)" in
+        Linux)  platform="linux" ;;
+        Darwin) platform="darwin" ;;
+        MINGW*|MSYS*|CYGWIN*) platform="win32" ;;
+        *) echo "Unsupported OS: $(uname -s)"; exit 1 ;;
+    esac
+
+    local arch
+    case "$(uname -m)" in
+        x86_64|amd64)  arch="amd64" ;;
+        arm64|aarch64) arch="arm64" ;;
+        *) echo "Unsupported arch: $(uname -m)"; exit 1 ;;
+    esac
+
+    # Map to Foundry release target names
+    local target
+    case "${platform}-${arch}" in
+        linux-amd64)  target="x86_64-unknown-linux-gnu" ;;
+        linux-arm64)  target="aarch64-unknown-linux-gnu" ;;
+        darwin-amd64) target="x86_64-apple-darwin" ;;
+        darwin-arm64) target="aarch64-apple-darwin" ;;
+        win32-amd64)  target="x86_64-pc-windows-msvc" ;;
+        *) echo "Unsupported platform: ${platform}-${arch}"; exit 1 ;;
+    esac
+
+    local ext="tar.gz"
+    local bin_ext=""
+    if [ "$platform" = "win32" ]; then
+        ext="zip"
+        bin_ext=".exe"
+    fi
+
+    # Get release URL
+    local release_url
+    if [ "$version" = "latest" ]; then
+        release_url="https://api.github.com/repos/${REPO}/releases/latest"
+    else
+        release_url="https://api.github.com/repos/${REPO}/releases/tags/${version}"
+    fi
+
+    echo "  fetching release info..."
+    local release_json
+    release_json=$(curl -fsSL "$release_url") || {
+        echo "No releases found at ${REPO}."
+        echo ""
+        echo "To install from source instead:"
+        echo "  git clone https://github.com/${REPO}.git"
+        echo "  cd foundry && cargo build -p cast -p forge --release"
+        echo "  cp target/release/cast ~/.igra/bin/igra-cast"
+        echo "  cp target/release/forge ~/.igra/bin/igra-forge"
+        exit 1
+    }
+
+    # Find asset URL for our target
+    local download_url
+    download_url=$(echo "$release_json" | grep -o "\"browser_download_url\": \"[^\"]*${target}[^\"]*\"" | head -1 | cut -d'"' -f4)
+
+    if [ -z "$download_url" ]; then
+        echo "No binary found for ${target} in release."
+        echo "Available from source: git clone https://github.com/${REPO}.git"
+        exit 1
+    fi
+
+    echo "  downloading ${target}..."
+    local tmp_dir
+    tmp_dir=$(mktemp -d)
+    trap "rm -rf '$tmp_dir'" EXIT
+
+    curl -fsSL "$download_url" -o "$tmp_dir/foundry.$ext"
+
+    echo "  extracting..."
+    mkdir -p "$tmp_dir/extracted"
+    if [ "$ext" = "tar.gz" ]; then
+        tar -xzf "$tmp_dir/foundry.$ext" -C "$tmp_dir/extracted"
+    else
+        unzip -oq "$tmp_dir/foundry.$ext" -d "$tmp_dir/extracted"
+    fi
+
+    # Rename to igra-* and install to IGRA_BIN_DIR
+    mkdir -p "$IGRA_BIN_DIR"
+
+    for bin in cast forge anvil chisel; do
+        local src="$tmp_dir/extracted/${bin}${bin_ext}"
+        local dst="$IGRA_BIN_DIR/igra-${bin}${bin_ext}"
+        if [ -f "$src" ]; then
+            mv "$src" "$dst"
+            chmod +x "$dst"
+        fi
+    done
+
+    echo ""
+    echo "IGRA Foundry installed to $IGRA_BIN_DIR:"
+    echo ""
+    for bin in cast forge anvil; do
+        local path="$IGRA_BIN_DIR/igra-${bin}${bin_ext}"
+        if [ -f "$path" ]; then
+            echo "  igra-${bin}  $(${path} --version 2>/dev/null || echo '(installed)')"
+        fi
+    done
+
+    echo ""
+    echo "Usage:"
+    echo "  igra-cast send --legacy --gas-price 1100000000000 ..."
+    echo "  igra-forge create --legacy --gas-price 1100000000000 ..."
+    echo ""
+    echo "These are separate from your standard Foundry install."
+    echo "Your existing cast/forge are untouched."
+}
+
+main "$@"

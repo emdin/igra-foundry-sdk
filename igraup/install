@@ -1,0 +1,48 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+IGRA_DIR="${IGRA_DIR:-$HOME/.igra}"
+IGRA_BIN_DIR="$IGRA_DIR/bin"
+
+main() {
+    echo "Installing igraup..."
+
+    mkdir -p "$IGRA_BIN_DIR"
+
+    IGRAUP_URL="https://raw.githubusercontent.com/IgraLabs/igra-foundry-sdk/main/igraup/igraup"
+    curl -fsSL "$IGRAUP_URL" -o "$IGRA_BIN_DIR/igraup"
+    chmod +x "$IGRA_BIN_DIR/igraup"
+
+    # Add to PATH
+    add_to_path
+
+    echo ""
+    echo "igraup installed to $IGRA_BIN_DIR/igraup"
+    echo ""
+    echo "Run 'igraup' to install IGRA Foundry (cast & forge)."
+    echo ""
+    echo "If igraup is not found, add this to your shell profile:"
+    echo "  export PATH=\"$IGRA_BIN_DIR:\$PATH\""
+}
+
+add_to_path() {
+    local profile
+    case "$SHELL" in
+        */zsh)  profile="$HOME/.zshenv" ;;
+        */bash) profile="$HOME/.bashrc" ;;
+        *)      profile="$HOME/.profile" ;;
+    esac
+
+    local path_entry="export PATH=\"$IGRA_BIN_DIR:\$PATH\""
+
+    if [ -f "$profile" ] && grep -q "$IGRA_BIN_DIR" "$profile" 2>/dev/null; then
+        return
+    fi
+
+    echo "" >> "$profile"
+    echo "# IGRA Foundry" >> "$profile"
+    echo "$path_entry" >> "$profile"
+    echo "Added $IGRA_BIN_DIR to PATH in $profile"
+}
+
+main "$@"

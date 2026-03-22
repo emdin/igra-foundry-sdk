@@ -1,0 +1,13 @@
+[profile.default]
+
+[profile.default.igra]
+enabled = true
+el_rpc_url = "YOUR_IGRA_RPC_URL"
+kaspa_rpc_url = "YOUR_KASPA_GRPC_URL"
+kaspa_network = "testnet-10"
+tx_id_prefix = "97b4"
+expected_el_chain_id = 38836
+el_receipt_timeout_secs = 10
+
+[profile.default.igra.kaspa_wallet]
+private_key = "YOUR_PRIVATE_KEY_HERE"

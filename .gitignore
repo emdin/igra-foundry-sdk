@@ -1,0 +1,29 @@
+# Secrets
+.env
+.env.*
+*.key
+*.pem
+*.secret
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Build artifacts
+target/
+out/
+cache/
+node_modules/
+
+# Foundry
+broadcast/
+lib/
+
+# Test artifacts
+perf-test/
