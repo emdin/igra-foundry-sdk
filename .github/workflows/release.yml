@@ -14,15 +14,12 @@ permissions:
 jobs:
   build:
     strategy:
+      fail-fast: false
       matrix:
         include:
           - os: ubuntu-latest
             target: x86_64-unknown-linux-gnu
             asset: igra-foundry-x86_64-unknown-linux-gnu.tar.gz
-          - os: ubuntu-latest
-            target: aarch64-unknown-linux-gnu
-            asset: igra-foundry-aarch64-unknown-linux-gnu.tar.gz
-            cross: true
           - os: macos-latest
             target: aarch64-apple-darwin
             asset: igra-foundry-aarch64-apple-darwin.tar.gz
@@ -40,10 +37,6 @@ jobs:
         with:
           targets: ${{ matrix.target }}
 
-      - name: Install cross (Linux ARM64)
-        if: matrix.cross
-        run: cargo install cross --git https://github.com/cross-rs/cross
-
       - name: Install protoc
         uses: arduino/setup-protoc@v3
         with:
@@ -55,15 +48,9 @@ jobs:
           git clone https://github.com/IgraLabs/kaswallet.git
           git clone -b roman/kaspa-igra-support https://github.com/IgraLabs/foundry.git
 
-      - name: Build (native)
-        if: ${{ !matrix.cross }}
+      - name: Build
         working-directory: foundry
         run: cargo build -p cast -p forge --release --target ${{ matrix.target }}
-
-      - name: Build (cross)
-        if: matrix.cross
-        working-directory: foundry
-        run: cross build -p cast -p forge --release --target ${{ matrix.target }}
 
       - name: Package (Unix)
         if: runner.os != 'Windows'
@@ -92,6 +79,7 @@ jobs:
   release:
     needs: build
     runs-on: ubuntu-latest
+    if: ${{ !cancelled() }}
     steps:
       - name: Download all artifacts
         uses: actions/download-artifact@v4
@@ -119,7 +107,6 @@ jobs:
             | Platform | Asset |
             |----------|-------|
             | Linux x86_64 | `igra-foundry-x86_64-unknown-linux-gnu.tar.gz` |
-            | Linux ARM64 | `igra-foundry-aarch64-unknown-linux-gnu.tar.gz` |
             | macOS ARM64 (Apple Silicon) | `igra-foundry-aarch64-apple-darwin.tar.gz` |
             | macOS x86_64 (Intel) | `igra-foundry-x86_64-apple-darwin.tar.gz` |
             | Windows x86_64 | `igra-foundry-x86_64-pc-windows-msvc.zip` |
