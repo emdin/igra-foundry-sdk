@@ -87,6 +87,20 @@ igra-cast send --legacy ... --timeout 10
 for i in {1..10}; do igra-cast send --legacy ... --async; done  # many will be dropped
 ```
 
+## Sequential Deployments
+
+**Known issue**: Deploying multiple contracts in quick succession often fails after the first one. The second deployment is silently dropped because the Kaspa change UTXO from the first transaction hasn't confirmed yet (~1-2 seconds).
+
+**Workaround**: Wait 3-5 seconds between deployments:
+
+```bash
+igra-forge create src/Counter.sol:Counter --legacy --gas-price 1100000000000 --gas-limit 500000 --broadcast ...
+sleep 5
+igra-forge create src/Vault.sol:Vault --legacy --gas-price 1100000000000 --gas-limit 500000 --broadcast ...
+```
+
+This affects any back-to-back write operations from the same wallet. Single transactions and read operations are not affected.
+
 ## Reorgs
 
 Reorged transactions are **discarded permanently** and not re-injected into the mempool.

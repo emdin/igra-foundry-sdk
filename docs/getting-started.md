@@ -183,6 +183,8 @@ Add to `remappings.txt`:
 | `insufficient Kaspa UTXOs` | No KAS on L1 for DA fees | Fund your Kaspa address (shown in error) with KAS |
 | Transaction hangs then times out | Gas limit too high (e.g., 30M), wrong `tx_id_prefix`, or nonce gap | Use realistic gas limit (500K-5M), verify prefix matches chain ID |
 | Dry run instead of actual deploy | Missing `--broadcast` on `forge create` | Add `--broadcast` to deploy commands |
+| `Constructor argument count mismatch` | `--constructor-args` may split numbers into chars | Known issue — use `igra-cast send --create` with ABI-encoded args as workaround |
+| Second deploy fails / silently dropped | Kaspa change UTXO not yet confirmed | Wait 3-5 seconds between deployments (`sleep 5`). See [Limitations](limitations.md#sequential-deployments) |
 
 ## Next Steps
 
