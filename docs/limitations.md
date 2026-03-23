@@ -42,9 +42,22 @@ Set gas limit to 1.5-2x the expected gas usage:
 
 ## Maximum Transaction Size
 
-Maximum L2 data payload is approximately **24 KB** (24,800 bytes), constrained by Kaspa's L1 data availability limit. Large contract deployments may need to use proxy patterns to stay under this limit.
+The theoretical L2 data payload limit is 24,800 bytes. However, **in practice, contract deployments larger than ~2 KB of bytecode are silently dropped** by the network. The Kaspa L1 transaction is accepted and broadcast, but the L2 IGRA node does not process it.
 
-The block gas limit is 10,000,000,000 (10B), so gas is not the bottleneck — payload size is.
+Tested deployment sizes (mainnet, March 2026):
+
+| Bytecode size | Result |
+|--------------|--------|
+| 322 B | Deployed in ~5s |
+| 509 B | Deployed in ~6s |
+| 1,886 B | Deployed in ~5s |
+| 3,188 B | Silently dropped |
+| 4,632 B | Silently dropped |
+| 5,836 B | Silently dropped |
+
+For contracts larger than ~2 KB, use **proxy patterns** (deploy a small proxy, then point it at a separately-deployed implementation) or deploy via the IGRA node's native deployment mechanism if available.
+
+The block gas limit is 10,000,000,000 (10B), so EVM gas is not the bottleneck — the Kaspa L1 payload size is.
 
 ## Confirmation Behavior
 
