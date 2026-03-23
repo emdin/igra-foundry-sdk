@@ -42,24 +42,19 @@ Set gas limit to 1.5-2x the expected gas usage:
 
 ## Maximum Transaction Size
 
-The theoretical L2 data payload limit is 24,800 bytes. However, **in practice, contract deployments larger than ~2 KB of bytecode are silently dropped** by the L2 network. This affects both the Foundry fork's direct Kaspa transport AND the IGRA RPC provider (`rpc.igralabs.com`) — confirming it's an L2-level constraint, not a client bug.
+Maximum L2 data payload is approximately **24 KB** (24,800 bytes), constrained by Kaspa's L1 data availability limit. Large contract deployments may need to use proxy patterns to stay under this limit.
 
-The Kaspa L1 transaction is accepted and broadcast successfully (with valid mass, prefix, and signature), but the L2 IGRA node does not include it.
+The block gas limit is 10,000,000,000 (10B), so gas is not the bottleneck — payload size is.
 
-Tested deployment sizes (mainnet, March 2026):
+**Important**: Larger contracts cost significantly more iKAS to deploy. At 1100 Gwei gas price:
 
-| Bytecode size | Result |
-|--------------|--------|
-| 322 B | Deployed in ~5s |
-| 509 B | Deployed in ~6s |
-| 1,886 B | Deployed in ~5s |
-| 3,188 B | Silently dropped |
-| 4,632 B | Silently dropped |
-| 5,836 B | Silently dropped |
+| Contract size | Typical gas | Deploy cost |
+|--------------|------------|-------------|
+| ~500 B (Counter) | ~158K | ~0.17 iKAS |
+| ~3 KB (ERC-20) | ~618K | ~0.68 iKAS |
+| ~6 KB (ERC-20 + mint/burn) | ~1.2M | ~1.31 iKAS |
 
-For contracts larger than ~2 KB, use **proxy patterns** (deploy a small proxy, then point it at a separately-deployed implementation) or deploy via the IGRA node's native deployment mechanism if available.
-
-The block gas limit is 10,000,000,000 (10B), so EVM gas is not the bottleneck — the Kaspa L1 payload size is.
+If your deploy is silently dropped, check your L2 iKAS balance first — insufficient balance causes transactions to be dropped with no error message.
 
 ## Confirmation Behavior
 

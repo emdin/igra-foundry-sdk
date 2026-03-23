@@ -105,7 +105,7 @@ When `igra.enabled = true` in `foundry.toml`, write operations (`send`, `create`
 | Gas limit | Realistic (1-5M) | 30M is fine |
 | Confirmation | ~3 seconds | ~12 seconds |
 | Ordering | FIFO (no MEV) | Gas-price auction |
-| Max deploy size | ~2 KB bytecode (see [limits](docs/limitations.md)) | ~24 KB |
+| Max TX size | ~24 KB | ~128 KB |
 
 **Do NOT set gas limit to 30M.** IGRA silently drops transactions with unreasonably large gas limits. Use 1.5-2x expected usage.
 

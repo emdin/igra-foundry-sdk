@@ -181,7 +181,7 @@ Add to `remappings.txt`:
 | `Error accessing local wallet` | No `--private-key` on CLI | Add `--private-key YOUR_KEY` (or apply [SDK patches](../patches/) for config fallback) |
 | `localhost:8545` connection refused | No `--rpc-url` on CLI | Add `--rpc-url https://rpc.igralabs.com:8545` (or apply [SDK patches](../patches/) for config fallback) |
 | `insufficient Kaspa UTXOs` | No KAS on L1 for DA fees | Fund your Kaspa address (shown in error) with KAS |
-| Transaction hangs then times out | Gas limit too high (e.g., 30M), wrong `tx_id_prefix`, or nonce gap | Use realistic gas limit (500K-5M), verify prefix matches chain ID |
+| Deploy silently dropped / times out | Insufficient iKAS balance for gas (a 3KB contract costs ~0.68 iKAS) | Check balance with `igra-cast balance`, fund wallet. Also: gas limit too high (30M), wrong `tx_id_prefix`, or nonce gap |
 | Dry run instead of actual deploy | Missing `--broadcast` on `forge create` | Add `--broadcast` to deploy commands |
 | `Constructor argument count mismatch` | `--constructor-args` may split numbers into chars | Known issue — use `igra-cast send --create` with ABI-encoded args as workaround |
 | Second deploy fails / silently dropped | Kaspa change UTXO not yet confirmed | Wait 3-5 seconds between deployments (`sleep 5`). See [Limitations](limitations.md#sequential-deployments) |
