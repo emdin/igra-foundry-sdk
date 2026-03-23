@@ -42,7 +42,9 @@ Set gas limit to 1.5-2x the expected gas usage:
 
 ## Maximum Transaction Size
 
-The theoretical L2 data payload limit is 24,800 bytes. However, **in practice, contract deployments larger than ~2 KB of bytecode are silently dropped** by the network. The Kaspa L1 transaction is accepted and broadcast, but the L2 IGRA node does not process it.
+The theoretical L2 data payload limit is 24,800 bytes. However, **in practice, contract deployments larger than ~2 KB of bytecode are silently dropped** by the L2 network. This affects both the Foundry fork's direct Kaspa transport AND the IGRA RPC provider (`rpc.igralabs.com`) — confirming it's an L2-level constraint, not a client bug.
+
+The Kaspa L1 transaction is accepted and broadcast successfully (with valid mass, prefix, and signature), but the L2 IGRA node does not include it.
 
 Tested deployment sizes (mainnet, March 2026):
 
